@@ -59,10 +59,7 @@ public class TestConf {
             // 配置不存在
             if ("".equals(watchCallback.getMyConf()
                     .getConf())) {
-                zk.exists("/",
-                        watchCallback,
-                        watchCallback,
-                        "exist");
+                watchCallback.await();
             }
             // 存在
             else {

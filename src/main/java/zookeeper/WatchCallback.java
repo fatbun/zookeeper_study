@@ -68,6 +68,26 @@ public class WatchCallback implements Watcher, AsyncCallback.StatCallback, Async
         }
     }
 
+    // DataCallback
+    public void processResult(int rc, String path, Object ctx, byte[] data, Stat stat) {
+
+        if (stat != null) {
+            System.out.println("-----DataCallback-----");
+            System.out.println("rc: " + rc);
+            System.out.println("path: " + path);
+            System.out.println("ctx: " + ctx);
+            System.out.println("data: " + new String(data));
+            System.out.println("stat: " + stat);
+
+            myConf.setConf(new String(data));
+            cdl.countDown();
+        } else {
+            System.out.println("-----DataCallback-----");
+            System.out.println("no data...");
+        }
+
+    }
+
     // Watcher
     public void process(WatchedEvent event) {
         System.out.println("-----watcher-----");
@@ -87,11 +107,12 @@ public class WatchCallback implements Watcher, AsyncCallback.StatCallback, Async
                 break;
             case NodeDeleted:
                 System.out.println("NodeDeleted " + event.getPath());
-                myConf.setConf("");
                 cdl = new CountDownLatch(1);
+                myConf.setConf("");
                 break;
             case NodeDataChanged:
                 System.out.println("NodeDataChanged " + event.getPath());
+                cdl = new CountDownLatch(1);
                 zk.getData("/",
                         this,
                         this,
@@ -109,26 +130,6 @@ public class WatchCallback implements Watcher, AsyncCallback.StatCallback, Async
             case PersistentWatchRemoved:
                 System.out.println("PersistentWatchRemoved " + event.getPath());
                 break;
-        }
-
-    }
-
-    // DataCallback
-    public void processResult(int rc, String path, Object ctx, byte[] data, Stat stat) {
-
-        if (stat != null) {
-            System.out.println("-----DataCallback-----");
-            System.out.println("rc: " + rc);
-            System.out.println("path: " + path);
-            System.out.println("ctx: " + ctx);
-            System.out.println("data: " + new String(data));
-            System.out.println("stat: " + stat);
-
-            myConf.setConf(new String(data));
-            cdl.countDown();
-        } else {
-            System.out.println("-----DataCallback-----");
-            System.out.println("no data...");
         }
 
     }
