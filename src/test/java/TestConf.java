@@ -1,3 +1,4 @@
+import org.apache.commons.lang.StringUtils;
 import org.apache.zookeeper.*;
 import org.junit.After;
 import org.junit.Before;
@@ -25,7 +26,7 @@ public class TestConf {
 
         try {
             zk = new ZooKeeper("127.0.0.1:2181/conf",
-                    1000,
+                    100000,
                     defaultWatch);
             defaultWatch.setCdl(cdl);
             cdl.await();
@@ -54,12 +55,17 @@ public class TestConf {
         watchCallback.setMyConf(conf);
 
         watchCallback.await();
+        // znode不存在，countDownLatch阻塞
+        // znode存在，zk.getData取值。有值则赋值且countDownLatch放开，null则继续阻塞
 
         while (true) {
             // 配置不存在
-            if ("".equals(watchCallback.getMyConf()
+            if (StringUtils.isBlank(watchCallback.getMyConf()
                     .getConf())) {
                 watchCallback.await();
+                // znode不存在，countDownLatch阻塞
+                // znode存在，zk.getData取值。有值则赋值且countDownLatch放开，null则继续阻塞
+
             }
             // 存在
             else {
