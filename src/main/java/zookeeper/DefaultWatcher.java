@@ -14,8 +14,8 @@ public class DefaultWatcher implements Watcher {
     }
 
     public void process(WatchedEvent event) {
-        System.out.println("----default watcher----");
-        System.out.println(event.getState());
+//        System.out.println("----default watcher----");
+//        System.out.println(event.getState());
         switch (event.getState()) {
             case Unknown:
                 break;
